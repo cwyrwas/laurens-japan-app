@@ -1,0 +1,949 @@
+<!doctype html>
+<html class="antialiased scroll-smooth">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link href="../dist/output.css" rel="stylesheet">
+	<link rel="favicon" href="assets/app-icon-sm.png" type="image/png" sizes="192x192">
+	<link rel="icon" href="assets/app-icon-lg.png" type="image/png" sizes="512x512">
+	<link rel="apple-touch-icon" href="assets/app-icon-lg.png" type="image/png" sizes="512x512">
+	<link rel="manifest" href="manifest.json">
+	<meta name="theme-color" content="#ffffff">
+	<meta name="description" content="Lauren's Japan App">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">	
+	<!-- Alpine Plugins -->
+	<script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/mask@3.x.x/dist/cdn.min.js"></script>	
+	<!-- Alpine Core -->
+	<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+	<title>Lauren's Japan Helper</title>
+</head>
+<body class="grid">
+	<div id="app" x-data="" class="flex flex-col content-center justify-between min-h-screen font-sans bg-slate-900">
+		<nav 
+		x-data="{ open: false }"
+		id="navbar" class="sticky top-0 flex items-center justify-between w-full py-3 text-white bg-rose-500">
+			<div class="flex-grow w-3/4"> 
+				<h1 class="text-2xl font-bold text-center md:text-start md:pl-6 lg:text-3xl">
+					Lauren's Japan App
+				</h1>
+			</div>
+			<div class="flex justify-end flex-grow w-1/4 text-right">
+				<button id="hamburger" class="relative flex flex-col items-center justify-center w-12 h-12 p-2 text-white transition-transform rounded-md hover:scale-125 " @click="open = !open">
+					<img src="assets/menu.svg" class="w-6 h-6 text-white fill-current" x-show="!open" />
+				</button>
+			</div>
+			
+			<div id="menuOptions" x-show="open" x-transition.duration.200ms @click.away="open = false" class="absolute top-0 right-0 text-white rounded-md shadow-md bg-slate-900">
+				<div class="flex flex-col px-6 py-3 space-y-3">
+					<span>
+						<a href="#converter" class="transition-all duration-100 ease-in-out hover:underline hover:font-bold">Money Converter</a>
+					</span>
+					<span>
+						<a href="#time" class="transition-all duration-100 ease-in-out hover:underline hover:font-bold">Time Difference</a>
+					</span>
+					<span>
+						<a href="#weatherForecast" class="transition-all duration-100 ease-in-out hover:underline hover:font-bold">Weather Forecast</a>
+					</span>
+					<span>
+						<a href="#vegetarianFood" class="transition-all duration-100 ease-in-out hover:underline hover:font-bold">Vegetarian Food</a>
+					</span>
+					<span>
+						<a href="#japaneseLanguage" class="transition-all duration-100 ease-in-out hover:underline hover:font-bold">Japanese Language</a>
+					</span>
+					<span>
+						<a href="#japanFacts" class="transition-all duration-100 ease-in-out hover:underline hover:font-bold">Japan Facts</a>
+					</span>
+					<span>
+						<a href="#facts" class="transition-all duration-100 ease-in-out hover:underline hover:font-bold">Cat Facts</a>
+					</span>
+				</div>
+			</div>
+		</nav>
+
+		<main class="max-w-lg px-3 mx-auto mt-3 bg-gray-200 rounded-md shadow-sm md:px-6 md:w-1/3">
+			<header class="px-2 py-3 mt-3 text-lg text-center">
+				<h3>
+					Convert &yen;en to USD and vice versa.
+				</h3>
+			</header>
+			<section id="converter" x-data="{
+				yen: true,
+				usd: false,
+				amount: 0,
+				result: 0,
+				exchangeRate: 0.0072,
+				convert: function() {
+					this.amount = parseFloat(this.amount);
+					this.result = (this.yen)
+						? this.amount * this.exchangeRate
+						: this.amount * (1 / this.exchangeRate);
+						
+					return this.result;
+				},
+				swapCurrency: function() {
+					this.yen = !this.yen;
+					this.usd = !this.usd;
+					this.convert();
+				},
+				resultCurrencyString: function() {
+					return (this.yen) ? 'USD' : 'yen';
+				},
+				inputCurrencyString: function() {
+					return (this.yen) ? 'yen' : 'USD';
+				},
+				formatCurrency: function(value) {
+					const formatter = new Intl.NumberFormat('en-US', {
+						style: 'currency',
+						currency: (this.yen) ? 'USD' : 'JPY',
+					});
+				
+					return formatter.format(value);
+				}
+				
+			}">
+				<div class="flex flex-col items-center justify-center py-3">
+					<label for="currency" class="w-full pb-2 text-xl font-extrabold text-center md:w-1/2">Select Currency</label>
+					<select @change="swapCurrency" name="currency" id="currency" class="w-full p-2 bg-white rounded-md shadow-sm md:w-3/4">
+						<option value="yen" selected>Yen</option>
+						<option value="usd">USD</option>
+					</select>
+				</div>
+				<div class="flex flex-col items-center justify-center py-3 mt-3">
+					<label for="amount" class="w-full pb-2 text-xl font-extrabold text-center md:w-1/2">Enter Amount (in <span x-html="inputCurrencyString()"></span>)</label>
+					<div class="flex flex-row items-center w-full md:w-3/4">
+						<div class="w-1/12 p-1 text-2xl font-bold text-center text-white rounded-l-md bg-slate-800">
+							<span x-show="yen">&yen;</span>
+							<span x-show="usd">$</span>
+						</div>
+						<div class="w-11/12">
+							<input x-data="" @keyup.enter="convert" x-model="amount" name="amount" id="amount" class="w-full p-2 bg-white shadow-sm rounded-r-md placeholder:pl-3 placeholder-slate-600" placeholder="0.00">
+						</div>
+					</div>
+					<button class="w-full px-3 py-2 mt-6 text-xl text-white uppercase transition-all duration-200 ease-in-out border-2 border-transparent rounded-md shadow-sm cursor-pointer hover:border-slate-800 hover:font-bold hover:bg-transparent hover:text-slate-800 bg-slate-800 md:w-3/4" 
+						@click="convert">
+							Convert to <span x-html="resultCurrencyString()"></span>
+					</button>
+				</div>
+				<div class="flex flex-col items-center justify-center py-3 mt-3">
+					<p class="w-full pb-2 text-xl font-extrabold text-center md:w-1/2">Result (in <span x-html="resultCurrencyString()"></span>)</p>
+					<div id="convertedAmount" class="flex flex-row">
+						<span id="result" class="px-4 py-2 text-2xl font-bold text-center text-green-700 border-2 border-green-700 rounded-md" x-text="formatCurrency(result)"></span>
+					</div>
+				</div>
+			</section>
+			<section 
+			id="time"
+			class="flex flex-col items-center max-w-3xl px-3 align-center"
+			x-data="{
+				timeInJapan: '',
+				timeAtHome: '',
+				timeDifference: '',
+				timeInit: function() {
+					const now = new Date();
+					const japanOptions = { timeZone: 'Asia/Tokyo', hour12: true, hour: 'numeric', minute: 'numeric', second: 'numeric' };
+					const homeOptions = { timeZone: 'America/New_York', hour12: true, hour: 'numeric', minute: 'numeric', second: 'numeric' };
+					const japanTime = now.toLocaleString('en-US', japanOptions);
+					const homeTime = now.toLocaleString('en-US', homeOptions);
+					this.timeInJapan = japanTime;
+					this.timeAtHome = homeTime;
+				},
+				start: function() {
+					this.timeInit();
+					setInterval(() => this.timeInit(), 1000);
+				}
+			}"
+			x-init="start()"
+			>
+				<div id="timeContainer" class="flex flex-col items-center justify-center w-full mt-5 md:w-3/4">
+					<h4 class="inline-flex flex-row items-center justify-center w-full mb-1 text-lg font-bold text-center text-slate-800">
+						<img src="assets/clock.svg" class="inline-block w-1/6 lg:w-1/12" />
+						<span>Times</span>
+					</h4>
+					<div id="timeResults" class="w-full pt-3 pb-6">
+						<div class="flex flex-col items-center justify-center w-full space-y-4 text-lg font-extrabold">
+							<div id="timeAtHome" class="px-6 py-3 text-pink-700 border-2 border-pink-700">Time at home: <span x-text="timeAtHome"></span></div>
+							<div id="timeInJapan" class="px-6 py-3 text-blue-800 border-2 border-blue-800">Time in Japan: <span x-text="timeInJapan"></span></div>
+						</div>
+					</div>
+				</div>	
+			</section>
+			<section id="weatherForecast" 
+			x-data="{
+				forecast: {},
+				typeOfWeather: '',
+				fetchDailyForecast: function() {
+					const tokyoLatitude = 35.6762;
+					const tokyoLongitude = 139.6503;
+					const endpoint = `https://api.open-meteo.com/v1/forecast?latitude=${tokyoLatitude}&longitude=${tokyoLongitude}&hourly=temperature_2m,relativehumidity_2m,precipitation,rain,weathercode&daily=weathercode&temperature_unit=fahrenheit&timezone=GMT&current_weather=true`;
+					fetch(endpoint)
+					.then(response => response.json())
+					.then(response => {
+					  this.forecast = response.current_weather;
+					  console.log(response.current_weather);
+					  console.log(this.forecast); // Check the structure of this.forecast
+					  if(this.forecast && this.forecast.weathercode) { // Ensure weathercode property exists
+						this.typeOfWeather = this.getWeatherFromCode(this.forecast.weathercode);
+					  } else {
+						console.log('Weathercode property not found');
+					  }
+					})
+				  },
+				getWeatherFromCode: function(weathercode) {
+					const codeMatrix = {
+						0: 'Clear sky',
+						1: 'Mainly clear',
+						2: 'Partly cloudy',
+						3: 'Overcast',
+						45: 'Fog',
+						48: 'Drizzle',
+						51: 'Light rain',
+						53: 'Moderate rain',
+						55: 'Heavy rain',
+						56: 'Freezing rain',
+						57: 'Light freezing rain',
+						60: 'Light snow',
+						61: 'Moderate Precipitation',
+						63: 'Heavy Precipitation',
+						65: 'Thunderstorm',
+						66: 'Light thunderstorm',
+						67: 'Heavy thunderstorm',
+						68: 'Hail',
+						70: 'Light hail',
+						71: 'Heavy hail',
+						72: 'Sleet',
+						73: 'Light sleet',
+						75: 'Heavy snow',
+						80: 'Showers',
+						81: 'Light showers',
+						82: 'Heavy showers',
+						95: 'Thunderstorm',
+						96: 'Light thunderstorm',
+						99: 'Heavy thunderstorm',
+					}
+
+					return codeMatrix[weathercode];
+				}
+			}"
+			x-init="fetchDailyForecast()"
+			>
+				<div id="weatherContainer"  class="flex flex-col items-center justify-center w-full mx-auto mb-3 md:w-3/4">
+					<h4 class="inline-flex flex-row items-center justify-center w-full mb-1 text-lg font-bold text-center text-slate-800">
+						<img src="assets/sun.svg" class="inline-block w-1/6 lg:w-1/12" />
+						<span>Today's Weather</span>
+					</h4>
+					<div class="px-6 py-3 text-white border-2 border-pink-700 rounded bg-slate-600"><span x-html="getWeatherFromCode(forecast.weathercode)"></span> (<span x-html="forecast.temperature"></span> degrees farenheight)</div>
+				</div>
+			</section>
+			<section 
+			id="vegetarianFood"
+			class="flex flex-col items-center max-w-3xl px-3 align-center"
+			x-data="{
+				selectedFoodCategory: '',
+				vegetarianFood: {
+					'Noodles': [
+						'Yasai Donburi (Vegetable Rice Bowl)',
+						'Yaki Onigiri (Grilled Rice Balls with Vegetables)',
+						'Soba or Udon Noodles (without meat or fish)',
+						'Vegetable Ramen (with vegetarian broth)',
+						'Yaki Udon (Stir-fried Udon Noodles with Vegetables)',
+						'Vegetable Tempura Udon (Udon Noodles with Vegetable Tempura)',
+						'Vegetable Soba Salad (Buckwheat Noodle Salad)',
+						'Vegetable Somen Salad (Thin Noodle Salad)',
+						'Vegetable Kakiage Soba (Buckwheat Noodles with Mixed Vegetable Tempura)',
+						'Vegetable Zaru Soba (Chilled Buckwheat Noodles with Dipping Sauce)',
+						'Vegetable Curry Udon (Udon Noodles in Curry Sauce)',
+						'Vegetable Soba Soup (Buckwheat Noodle Soup)',
+						'Vegetable Yakisoba (Stir-fried Noodles)',
+						'Vegetable Soba Gaki (Buckwheat Dumplings with Assorted Vegetables)',
+						'Vegetable Ankake Yakisoba (Stir-fried Noodles with Thick Sauce and Vegetables)',
+						'Vegetable Noppei Jiru (Miso-based Soup with Vegetables and Tofu)',
+						'Vegetable Tsukemen (Dipping Noodles with Assorted Vegetables)',
+						'Vegetable Abura Soba (Soupless Ramen with Assorted Vegetables)'
+					],
+					'Soups': [
+						'Miso Soup (without fish)',
+						'Yudofu (Hot Tofu Soup)',
+						'Vegetable Miso Dengaku (Grilled Vegetables with Miso Glaze)',
+						'Vegetable Zosui (Japanese Rice Soup with Vegetables)',
+						'Vegetable Oden (Simmered Vegetables in Soy-based Broth)',
+						'Vegetable Hijiki Donburi (Rice Bowl with Hijiki Seaweed and Vegetables)'
+					],
+					'Sushi and Rice Dishes': [
+						'Vegetable Sushi (Maki, Nigiri, and Inari)',
+						'Inari Sushi (Rice-filled Tofu Pockets)',
+						'Vegetable Chirashi Sushi (Scattered Sushi with Assorted Vegetables)',
+						'Vegetable Oshi Sushi (Pressed Sushi with Vegetables)',
+						'Vegetable Onigirazu (Rice Sandwich with Vegetables)',
+						'Vegetable Kaisen Don (Rice Bowl with Assorted Vegetables and Seafood)',
+						'Vegetable Yasai Tempura Donburi (Rice Bowl with Vegetable Tempura)'
+					],
+					'Appetizers and Snacks': [
+						'Vegetable Tempura',
+						'Vegetable Gyoza (Dumplings)',
+						'Agedashi Tofu (Deep-fried Tofu in Dashi Sauce)',
+						'Vegetable Yakitori (Skewered Grilled Vegetables)',
+						'Vegetable Tamagoyaki (Japanese Rolled Omelette with Vegetables)',
+						'Hiyayakko (Chilled Tofu)',
+						'Natto (Fermented Soybeans)',
+						'Vegetable Teppanyaki (Grilled Vegetables)',
+						'Vegetable Katsu (Breaded and Fried Vegetables)',
+						'Vegetable Korokke (Potato and Vegetable Croquettes)',
+						'Vegetable Mozuku (Seaweed) Sunomono (Vinegared Dish)',
+						'Vegetable Nama Harumaki (Fresh Spring Rolls with Vegetables)',
+						'Vegetable Hijiki (Seaweed and Vegetable Dish)',
+						'Vegetable Okara (Soy Pulp) Dish',
+						'Vegetable Tanmen (Stir-fried Vegetables with Noodles in Broth)',
+						'Vegetable Kabocha Salad (Pumpkin Salad with Assorted Vegetables)',
+						'Vegetable Tamago Kake Gohan (Rice with Raw Egg and Vegetables)',
+						'Vegetable Tofu Hamburger Steak',
+						'Vegetable Tofu Salad',
+						'Vegetable Goma Dofu (Sesame Tofu)',
+						'Vegetable Hijiki (Seaweed and Vegetable Dish)'
+					],
+					'Others': [
+						'Vegetable Curry',
+						'Vegetable Kamo Nasu (Grilled Eggplant with Miso and Sesame)',
+						'Vegetable Nikujaga (Potato and Vegetable Stew)',
+						'Nasu Dengaku (Grilled Eggplant with Miso Glaze)',
+						'Vegetable Okonomiyaki (Savory Pancake)',
+						'Vegetable Shabu-shabu (Hot Pot with Assorted Vegetables)',
+						'Vegetable Nabe (Hot Pot with Assorted Vegetables)',
+						'Vegetable Nabe Yaki Udon (Hot Pot with Udon Noodles and Vegetables)',
+						'Vegetable Goya Champuru (Bitter Melon Stir-fry)',
+						'Vegetable Kinpira (Sauteed Vegetables)',
+						'Vegetable Kakiage (Mixed Vegetable Tempura)',
+						'Vegetable Kamo Nasu (Grilled Eggplant with Miso and Sesame)',
+						'Vegetable Chanko Nabe (Sumo Wrestlers\' Hot Pot with Tofu and Vegetables)',
+						'Vegetable Natto Okonomiyaki (Savory Pancake with Fermented Soybeans)',
+						'Vegetable Koya Dofu (Freeze-dried Tofu)',
+						'Vegetable Mapo Tofu (Tofu with Spicy Sauce)'
+					]
+				},
+			}	
+			"
+			>
+				<div id="foodContainer" class="flex flex-col items-center justify-center w-full md:w-3/4">
+					<h4 class="inline-flex flex-row items-center justify-center w-full mb-1 text-lg font-bold text-center text-slate-800">
+						<img src="assets/fire.svg" class="inline-block w-1/6 lg:w-1/12" />
+						<span>Vegetarian Food in Japan</span>
+					</h4>
+					<form id="categoryForm" class="flex flex-col items-center w-full pb-6 mx-auto">
+						<select id="foodCategory" 
+						x-model="selectedFoodCategory"
+						name="foodCategory" class="w-full px-3 py-2 mt-3 text-xl bg-white border-2 border-blue-800 rounded-md shadow-sm md:w-3/4 text-slate-800">
+							<option value="" selected >Select a category</option>
+							<option value="Noodles">Noodles</option>
+							<option value="Soups">Soups</option>
+							<option value="Sushi and Rice Dishes">Sushi and Rice Dishes</option>
+							<option value="Appetizers and Snacks">Appetizers and Snacks</option>
+							<option value="Others">Others</option>
+						</select>
+					</form>
+					<div id="foodResults" 
+					x-show="selectedFoodCategory.length > 0"
+					x-transition:enter.duration.500ms
+					x-transition:leave.duration.400ms
+					>
+						<ul class="pt-3 mb-12 space-y-3 overflow-y-auto list-disc list-inside max-h-80 text-md ">
+							<template x-for="item in vegetarianFood[selectedFoodCategory]">
+								<li class="border-b list-item border-slate-50" x-text="item"></li>
+							</template>
+						</ul>
+					</div>
+				</div>
+			</section>
+			<section 
+			id="japaneseLanguage"
+			class="flex flex-col items-center max-w-3xl px-3 align-center">
+				<div id="translationContainer" class="flex flex-col items-center justify-center w-full md:w-3/4"
+				x-data="{
+					selectedTranslationCategory: '',
+					translations: {
+						'Greetings': [
+							{
+								'English': 'Hello',
+								'Japanese': 'こんにちは (Konnichiwa)'
+							},
+							{
+								'English': 'Good morning',
+								'Japanese': 'おはようございます (Ohayou gozaimasu)',
+							},
+							{
+								'English': 'Good evening',
+								'Japanese': 'こんばんは (Konbanwa)',
+							},
+							{
+								'English': 'Goodbye',
+								'Japanese': 'さようなら (Sayounara)',
+							},
+							{
+								'English': 'Thank you',
+								'Japanese': 'ありがとうございます (Arigatou gozaimasu)',
+							},
+							{
+								'English': 'You\'re welcome',
+								'Japanese': 'どういたしまして (Dou itashimashite)',
+							}
+						],
+						'Phrases': [
+							{
+								'English': 'Yes',
+								'Japanese': 'はい (Hai)',
+							},
+							{
+								'English': 'No',
+								'Japanese': 'いいえ (Iie)',
+							},
+							{
+								'English': 'Please',
+								'Japanese': 'お願いします (Onegaishimasu)',
+							},
+							{
+								'English': 'Excuse me',
+								'Japanese': 'すみません (Sumimasen)',
+							},
+							{
+								'English': 'I\'m sorry',
+								'Japanese': 'ごめんなさい (Gomen nasai)',
+							},
+							{
+								'English': 'I don\'t understand',
+								'Japanese': 'わかりません (Wakarimasen)',
+							},
+							{
+								'English': 'Do you speak English?',
+								'Japanese': '英語を話しますか？ (Eigo o hanashimasu ka?)',
+							},
+							{
+								'English': 'Where is...?',
+								'Japanese': '...はどこですか？ (...wa doko desu ka?)',
+							},
+							{
+								'English': 'How much is this?',
+								'Japanese': 'これはいくらですか？ (Kore wa ikura desu ka?)',
+							},
+							{
+								'English': 'I need help',
+								'Japanese': '助けてください (Tasukete kudasai)',
+							},
+							{
+								'English': 'Can you help me?',
+								'Japanese': '手伝ってくれますか？ (Tetsudatte kuremasu ka?)',
+							}
+						],
+						'Dining': [
+							{
+								'English': 'I\'m vegetarian',
+								'Japanese': '私はベジタリアンです (Watashi wa bejitarian desu)',
+							},
+							{
+								'English': 'Is this vegetarian?',
+								'Japanese': 'これはベジタリアン料理ですか？ (Kore wa bejitarian ryouri desu ka?)',
+							},
+							{
+								'English': 'No meat',
+								'Japanese': '肉なしでお願いします (Niku nashi de onegaishimasu)',
+							},
+							{
+								'English': 'No fish',
+								'Japanese': '魚なしでお願いします (Sakana nashi de onegaishimasu)',
+							},
+							{
+								'English': 'Can you recommend a vegetarian dish?',
+								'Japanese': 'ベジタリアン向けの料理をおすすめしてもらえますか？ (Bejitarian muke no ryouri o osusume shite moraemasu ka?)',
+							},
+							{
+								'English': 'Is there an English menu?',
+								'Japanese': '英語のメニューはありますか？ (Eigo no menyuu wa arimasu ka?)',
+							}
+						],
+						'Directions': [
+							{
+								'English': 'Where is the train station?',
+								'Japanese': '駅はどこですか？ (Eki wa doko desu ka?)',
+							},
+							{
+								'English': 'Where is the bus stop?',
+								'Japanese': 'バス停はどこですか？ (Basutei wa doko desu ka?)',
+							},
+							{
+								'English': 'Where is the bathroom?',
+								'Japanese': 'トイレはどこですか？ (Toire wa doko desu ka?)',
+							},
+							{
+								'English': 'How do I get to...?',
+								'Japanese': '...に行くにはどうすればいいですか？ (...ni iku ni wa dou sureba ii desu ka?)',
+							},
+							{
+								'English': 'Is it far?',
+								'Japanese': '遠いですか？ (Tooi desu ka?)',
+							},
+							{
+								'English': 'Is it close?',
+								'Japanese': '近いですか？ (Chikai desu ka?)',
+							}
+						]
+					}
+				}"
+				>
+					<h4 class="inline-flex flex-row items-center justify-center w-full mb-1 text-lg font-bold text-center text-slate-800">
+						<img src="assets/language.svg" class="inline-block w-1/6 lg:w-1/12" />
+						<span>Helpful Translations</span>
+					</h4>
+					<form id="translationCategoryForm" class="flex flex-col items-center w-full pb-6 mx-auto">
+						<select id="translationCategory" 
+						x-model="selectedTranslationCategory"
+						name="translationCategory" class="w-full px-3 py-2 mt-3 text-xl bg-white border-2 border-blue-800 rounded-md shadow-sm md:w-3/4 text-slate-800">
+							<option value="" selected >Select a category</option>
+							<option value="Greetings">Greetings</option>
+							<option value="Phrases">Basic Phrases</option>
+							<option value="Dining">Dining</option>
+							<option value="Directions">Directions</option>
+						</select>
+					</form>
+					<div id="translationResults" 
+					x-show="selectedTranslationCategory.length > 0"
+					x-transition:enter.duration.500ms
+					x-transition:leave.duration.400ms
+					class="w-full pt-3 pb-6"
+					>
+
+						<div class="relative overflow-x-auto">
+							<table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+								<thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+									<tr>
+										<th scope="col" class="px-6 py-3">
+											English
+										</th>
+										<th scope="col" class="px-6 py-3">
+											Japanese
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									<template x-for="item in translations[selectedTranslationCategory]">
+										<tr class="bg-white dark:bg-gray-800">
+											<td class="px-6 py-4" x-text="item.English"></td>
+											<td class="px-6 py-4" x-text="item.Japanese"></td>
+										</tr>
+									</template>					
+								</tbody>
+							</table>
+						</div>	
+					</div>	
+				</div>
+			</section>
+			<section 
+			class="flex flex-col items-center max-w-3xl px-3 align-center"
+			id="japanFacts"
+			x-data="{
+				facts: 
+				[
+					'Japan is an island country located in East Asia.',
+					'The capital city of Japan is Tokyo.',
+					'The official language of Japan is Japanese.',
+					'Japan has a population of over 126 million people.',
+					'Japan has the third-largest economy in the world.',
+					'Japan is known for its technological advancements and innovation.',
+					'The national sport of Japan is sumo wrestling.',
+					'Cherry blossoms, known as sakura, are a symbol of Japan.',
+					'Mount Fuji is the highest mountain in Japan.',
+					'Japanese cuisine is renowned worldwide, including sushi, ramen, and tempura.',
+					'Japan has a high life expectancy and is known for its healthy lifestyle.',
+					'The bullet train, called Shinkansen, is famous for its speed and efficiency.',
+					'Japan has a strong cultural emphasis on politeness and respect.',
+					'Karaoke is a popular form of entertainment in Japan.',
+					'Manga and anime are significant parts of Japanese popular culture.',
+					'Tokyo Disneyland is the first Disney park built outside the United States.',
+					'The traditional Japanese tea ceremony is a highly ritualized practice.',
+					'The Hiroshima Peace Memorial Park commemorates the atomic bombing of Hiroshima.',
+					'Japan is composed of 6,852 islands.',
+					'Kyoto is known for its beautiful temples, shrines, and traditional geisha culture.',
+					'The Tokyo Tower is an iconic landmark in Japan.',
+					'Baseball is one of the most popular sports in Japan.',
+					'Japan is prone to earthquakes and has a well-developed earthquake preparedness system.',
+					'The Akihabara district in Tokyo is famous for its electronics and gaming culture.',
+					'Japanese gardens are meticulously designed and often represent harmony and tranquility.',
+					'Japan has a rich history and was ruled by emperors for centuries.',
+					'The Great Buddha of Kamakura is a famous bronze statue in Japan.',
+					'Japanese onsen, or hot springs, are popular for relaxation and therapeutic purposes.',
+					'The traditional Japanese clothing is called kimono.',
+					'Tokyo Skytree is the tallest tower in Japan and offers panoramic views of the city.',
+					'Japan has a high-speed internet infrastructure and is known for its tech-savvy population.',
+					'The Imperial Palace in Tokyo is the primary residence of the Emperor of Japan.',
+					'The Japanese yen is the official currency of Japan.',
+					'The country is known for its efficient public transportation systems, including trains and buses.',
+					'Japanese sake, a traditional rice wine, is popular both domestically and internationally.',
+					'Sumo wrestlers train in stables called \'heya\'.',
+					'Japan has a declining birth rate and an aging population.',
+					'Harajuku, in Tokyo, is famous for its quirky and colorful street fashion.',
+					'The Japanese writing system includes hiragana, katakana, and kanji characters.',
+					'Traditional Japanese arts include ikebana (flower arrangement) and calligraphy.',
+					'The Tokyo Stock Exchange is one of the largest stock exchanges globally.',
+					'Kobe beef, known for its high quality and marbling, is a delicacy in Japan.',
+					'Japan hosted the Summer Olympics in Tokyo in 1964 and 2021.',
+					'The Studio Ghibli Museum showcases the works of the renowned animation studio.',
+					'Japanese toilets are often equipped with advanced features like bidets and heated seats.',
+					'Japanese vending machines offer a wide variety of products, including hot drinks and electronics.',
+					'The Meiji Shrine in Tokyo is dedicated to the deified spirits of Emperor Meiji and Empress Shōken.',
+					'Japan is known for its efficient and reliable public transportation system, including bullet trains.',
+					'The traditional Japanese art of paper folding is called origami.',
+					'Shintoism and Buddhism are the two major religions in Japan.',
+					'Japan has a high literacy rate, with education being highly valued.',
+					'The Tokyo Metropolitan Government Building has observation decks that offer panoramic views of the city.',
+					'The art of taiko drumming originated in Japan and is performed at festivals and events.',
+					'Japanese technology companies like Sony, Nintendo, and Toyota have a global presence.',
+					'The Island of Okinawa is famous for its beautiful beaches and unique culture.',
+					'Japan has a wide variety of traditional festivals, known as \'matsuri\'.',
+					'The Tokyo Dome is a large sports and entertainment venue in Japan.',
+					'The Japanese word \'kawaii\' means cute and is often used to describe adorable things.',
+					'The Japanese tea ceremony is a ceremonial way of preparing and serving powdered green tea.',
+					'Japan has a well-developed railway network, including the famous bullet trains.',
+					'The Odaiba district in Tokyo is known for its futuristic architecture and entertainment venues.',
+					'Japan is known for its high-quality electronic products and innovations.',
+					'Miyajima Island is famous for its \'floating\' Torii gate and Itsukushima Shrine.',
+					'Japan is home to many UNESCO World Heritage Sites, including Kyoto\'s Kinkaku-ji (Golden Pavilion).',
+					'Japanese gardens often feature elements such as ponds, bridges, and carefully manicured trees.',
+					'The Japanese art of flower arranging is known as ikebana.',
+					'Japan is a leading producer of automobiles and has several major car manufacturers.',
+					'The A-Bomb Dome in Hiroshima is a UNESCO World Heritage Site and a symbol of peace.',
+					'Japan experiences four distinct seasons: spring, summer, autumn, and winter.',
+					'The Imperial Palace East Gardens in Tokyo are open to the public and showcase beautiful landscapes.',
+					'The Nara Park in Nara is famous for its free-roaming deer population.',
+					'The art of traditional Japanese theater is known as kabuki.',
+					'Japan has a well-developed and extensive high-speed rail network.',
+					'The Japanese tea ceremony is influenced by Zen Buddhism and focuses on mindfulness.',
+					'Japanese calligraphy, known as \'shodo\', is a highly regarded art form.',
+					'Japan is known for its high standard of cleanliness and well-maintained public spaces.',
+					'The Kiyomizu-dera Temple in Kyoto is an iconic wooden structure that offers panoramic views of the city.',
+					'The Japanese have a strong work ethic and value dedication and discipline.',
+					'Japan is one of the leading countries in the field of robotics.',
+					'The Gion district in Kyoto is known for its traditional geisha culture.',
+					'Japanese folklore includes mythical creatures like dragons, kitsune (foxes), and tanuki (raccoon dogs).',
+					'The Hakone Open-Air Museum is a popular attraction showcasing contemporary sculptures and art installations.',
+					'Japan is a mountainous country, with over 70% of its land covered in mountains.',
+					'The annual cherry blossom season, known as hanami, is celebrated with picnics and gatherings.',
+					'The Toei Kyoto Studio Park allows visitors to experience traditional Edo-period Japan.',
+					'The Japanese art of bonsai involves growing miniature trees in containers.',
+					'Japanese traditional footwear is known as geta and zori.',
+					'Japan has a high rate of public safety and is known for its low crime rates.',
+					'The Himeji Castle in Hyogo is one of Japan\'s most famous and well-preserved castles.',
+					'Japan has a wide range of hot springs, offering therapeutic properties.',
+					'The Sapporo Snow Festival in Hokkaido attracts millions of visitors each year with its ice and snow sculptures.',
+					'The Okinawa Islands have a unique culture influenced by its historical connections to China and Southeast Asia.',
+					'Japanese cuisine often includes a variety of seafood, rice, and noodles.',
+					'The Jigokudani Monkey Park in Nagano is famous for its hot spring-loving snow monkeys.',
+					'Japan has a strong emphasis on recycling and has implemented efficient waste management systems.',
+					'The Yoyogi Park in Tokyo is a popular spot for picnics, sports, and cherry blossom viewing.',
+					'The Japanese traditional theater form of Noh dates back to the 14th century.',
+					'The Horyu-ji Temple in Nara is one of the oldest wooden buildings in the world.',
+					'Japanese society places a strong emphasis on harmony and group consensus.',
+					'Japan is known for its high-quality craftsmanship in pottery, ceramics, and lacquerware.',
+					'The Japanese art of swordsmanship is known as kendo.',
+					'Japan has a wide range of traditional arts and crafts, including pottery, tea ceremonies, and textile dyeing.',
+					'The Hiroshima Peace Memorial Museum provides information about the devastating impact of the atomic bomb.',
+					'The Tottori Sand Dunes in Tottori Prefecture are the largest sand dunes in Japan.',
+					'Japan has a diverse range of regional cuisines, each with its own specialties.',
+					'The Japanese word \'kirei\' means beautiful and is often used to describe aesthetic appreciation.',
+					'The Tsukiji Fish Market in Tokyo is one of the largest fish markets in the world.',
+					'Japan has a well-developed healthcare system and is known for its longevity.',
+					'The Ryoan-ji Temple in Kyoto features a famous rock garden known for its simplicity and serenity.',
+					'Japanese traditional arts often incorporate elements of nature and seasonal changes.',
+					'The Japanese word \'omotenashi\' refers to the spirit of hospitality and excellent customer service.',
+					'The Oiran Parade in Asakusa, Tokyo, showcases traditional courtesan culture and costumes.',
+					'Japan has a wide range of traditional performing arts, including Noh, Kabuki, and Bunraku.',
+					'The Ainu are an indigenous people in Japan with a distinct culture and language.',
+					'The Kiyomizu-dera Temple in Kyoto is a UNESCO World Heritage Site and a popular tourist attraction.',
+					'Japan has a unique blend of traditional and modern architecture in its cities.',
+					'The Japanese art of flower arrangement, ikebana, focuses on simplicity, balance, and harmony.',
+					'The Japanese traditional drum, taiko, is often used in festivals and performances.',
+					'Japan has a rich folklore tradition, with stories of yokai (supernatural creatures) and legends.',
+					'The Seto Inland Sea is a popular destination for its scenic beauty and islands.',
+					'Japanese traditional music includes instruments such as the shamisen, koto, and shakuhachi.',
+					'The Kurobe Dam in Toyama is one of Japan\'s tallest and most impressive dams.',
+					'Japan has a diverse range of natural landscapes, including mountains, forests, and coastal areas.',
+					'The Japanese art of pottery, known as \'yakimono,\' has a long history and regional variations.',
+					'The traditional Japanese martial art of judo originated in Japan in the late 19th century.',
+					'Japan has a strong tea culture, with matcha being a popular type of powdered green tea.',
+					'The Sapporo Brewery in Hokkaido is one of Japan\'s oldest and most famous breweries.',
+					'Japanese traditional dance, known as Nihon Buyo, combines elements of theater and movement.',
+					'Japan has a rich tradition of storytelling, including folk tales, myths, and historical narratives.',
+					'The Itsukushima Shrine in Hiroshima is famous for its \'floating\' Torii gate.',
+					'Japanese traditional festivals often feature parades, fireworks, and traditional performances.',
+					'The Ama divers in Japan are known for their traditional free-diving techniques for harvesting pearls and seafood.',
+					'Japan has a variety of regional dialects, each with its own unique characteristics.',
+					'The Japanese art of tattooing, irezumi, has a long history and cultural significance.',
+					'Japan has a strong tradition of tea ceremonies, which involve the preparation and serving of matcha tea.',
+					'The Aso Caldera in Kumamoto is one of the world\'s largest volcanic calderas.',
+					'Japanese traditional masks, such as Noh masks and kitsune masks, are used in theater and festivals.',
+					'The Japanese tea house architecture emphasizes simplicity, natural materials, and connection to nature.',
+					'Japan has a rich tradition of tea ceremonies, known as \'chado\' or \'sadou\'.',
+					'The Mount Fuji, located in Honshu, is the highest mountain in Japan.',
+					'Japanese traditional arts often incorporate elements of nature and seasonal changes.',
+					'The Japanese word \'omotenashi\' refers to the spirit of hospitality and excellent customer service.',
+					'The Jigokudani Monkey Park in Nagano is famous for its hot spring-loving snow monkeys.',
+					'The Himeji Castle in Hyogo is one of Japan\'s most famous and well-preserved castles.',
+					'The Tsukiji Fish Market in Tokyo is one of the largest fish markets in the world.',
+					'Japan has a well-developed healthcare system and is known for its longevity.',
+					'The Kinkaku-ji Temple in Kyoto, also known as the Golden Pavilion, is a UNESCO World Heritage Site.',
+					'Japanese society places a strong emphasis on harmony and group consensus.',
+					'Japan is known for its high-quality craftsmanship in pottery, ceramics, and lacquerware.',
+					'The Japanese art of swordsmanship is known as \'kendo\'.',
+					'Japan has a wide range of traditional arts and crafts, including pottery, tea ceremonies, and textile dyeing.',
+					'The Hiroshima Peace Memorial Museum provides information about the devastating impact of the atomic bomb.',
+					'The Akihabara district in Tokyo is a hub for anime, manga, and electronic gadgets.',
+					'Japan has a diverse range of traditional performing arts, including Noh, Kabuki, and Bunraku.',
+					'The Ainu are an indigenous people in Japan with a distinct culture and language.',
+					'The Kiyomizu-dera Temple in Kyoto is a UNESCO World Heritage Site and a popular tourist attraction.',
+					'Japan has a unique blend of traditional and modern architecture in its cities.',
+					'The Japanese art of flower arrangement, ikebana, focuses on simplicity, balance, and harmony.',
+					'The Japanese traditional drum, taiko, is often used in festivals and performances.',
+					'Japan has a rich folklore tradition, with stories of yokai (supernatural creatures) and legends.',
+					'The Seto Inland Sea is a popular destination for its scenic beauty and islands.',
+					'Japanese traditional music includes instruments such as the shamisen, koto, and shakuhachi.',
+					'The Kurobe Dam in Toyama is one of Japan\'s tallest and most impressive dams.',
+					'Japan has a diverse range of natural landscapes, including mountains, forests, and coastal areas.',
+					'The Japanese art of pottery, known as \'yakimono,\' has a long history and regional variations.',
+					'The traditional Japanese martial art of judo originated in Japan in the late 19th century.',
+					'Japan has a strong tea culture, with matcha being a popular type of powdered green tea.',
+					'The Sapporo Brewery in Hokkaido is one of Japan\'s oldest and most famous breweries.',
+					'Japanese traditional dance, known as Nihon Buyo, combines elements of theater and movement.',
+					'Japan has a rich tradition of storytelling, including folk tales, myths, and historical narratives.',
+					'The Itsukushima Shrine in Hiroshima is famous for its \'floating\' Torii gate.',
+					'Japanese traditional festivals often feature parades, fireworks, and traditional performances.',
+					'The Ama divers in Japan are known for their traditional free-diving techniques for harvesting pearls and seafood.',
+					'Japan has a variety of regional dialects, each with its own unique characteristics.',
+					'The Japanese art of tattooing, irezumi, has a long history and cultural significance.',
+					'Japan has a strong tradition of tea ceremonies, which involve the preparation and serving of matcha tea.',
+					'The Aso Caldera in Kumamoto is one of the world\'s largest volcanic calderas.',
+					'Japanese traditional masks, such as Noh masks and kitsune masks, are used in theater and festivals.',
+					'The Japanese tea house architecture emphasizes simplicity, natural materials, and connection to nature.',
+					'Japan is known for its advanced robotics industry.',
+					'The Tokyo Metropolitan Government Building is a prominent landmark in Tokyo.',
+					'Japanese traditional pottery includes styles such as Arita, Hagi, and Bizen ware.',
+					'Japan has a wide range of traditional musical instruments, including the shamisen, koto, and shakuhachi.',
+					'The Himeji Castle in Hyogo is a UNESCO World Heritage Site and one of Japan\'s most magnificent castles.',
+					'Japan has a strong tradition of martial arts, including karate, judo, and kendo.',
+					'Japanese traditional theater includes forms such as Noh, Kabuki, and Bunraku.',
+					'The Tsukiji Fish Market in Tokyo is famous for its early morning tuna auctions.',
+					'Japan is home to numerous hot springs resorts, offering relaxation and therapeutic benefits.',
+					'The Japanese art of flower arrangement, ikebana, emphasizes harmony and simplicity.',
+					'Japan has a wide variety of regional delicacies, such as Okonomiyaki in Hiroshima and Takoyaki in Osaka.',
+					'The Golden Pavilion, Kinkaku-ji, is a famous Zen Buddhist temple in Kyoto.',
+					'Japanese fashion trends often influence global styles, with Harajuku and Shibuya as fashion hubs.',
+					'The Nara period (710-794) in Japan saw the flourishing of Buddhist art and architecture.',
+					'Japan has a rich tradition of craftsmanship in sword making, known as katana.',
+					'The Fushimi Inari Taisha in Kyoto is famous for its thousands of torii gates.',
+					'The Japanese art of lacquerware, urushi, involves applying layers of natural lacquer to create durable and decorative objects.',
+					'Japan has a diverse range of traditional performing arts, including taiko drumming and traditional dance forms.',
+					'The Ogasawara Islands, also known as the Bonin Islands, are a remote and ecologically significant archipelago.',
+					'Japanese temples and shrines often feature beautiful gardens with carefully landscaped elements.',
+					'Japan has a deep appreciation for nature, with many national parks and preserved natural areas.',
+					'The Matsumoto Castle in Nagano is one of Japan\'s oldest surviving castles.',
+					'The Japanese art of tea ceremony, known as chado or sadou, is a highly ritualized and meditative practice.',
+					'Japan has a wide variety of traditional sweets and confections, known as wagashi.',
+					'The Aomori Nebuta Festival is a vibrant summer festival featuring large illuminated floats.',
+					'Japanese traditional woodworking techniques, such as joinery and carpentry, are highly regarded for their precision and craftsmanship.',
+					'The Akihabara district in Tokyo is a hub for anime, manga, and electronic gadgets.',
+					'Japan has a rich folklore tradition, with mythical creatures such as kappa, tengu, and yuki-onna.',
+					'The Hikone Castle in Shiga is one of the few original surviving castles in Japan.',
+					'Japanese gardens often incorporate elements such as rocks, water features, and meticulously pruned trees.',
+					'Japan has a well-developed network of hiking trails, including the famous Kumano Kodo and Nakasendo routes.',
+					'The Sumo wrestling tradition in Japan dates back thousands of years and is a highly regarded sport.',
+					'Japanese traditional architecture often includes sliding doors, known as fusuma and shoji, made from paper or wood.',
+					'Japan has a strong tradition of mask-making, with various types of masks used in festivals, theater, and religious ceremonies.',
+					'The Todai-ji Temple in Nara houses the Great Buddha, one of the largest bronze statues in the world.',
+					'Japanese traditional music often includes instruments such as the shamisen, koto, and shakuhachi flute.',
+					'Japan has a wide range of traditional crafts, including pottery, lacquerware, textile weaving, and metalwork.',
+					'The Meiji Shrine in Tokyo is dedicated to Emperor Meiji and Empress Shoken and offers a peaceful retreat in the heart of the city.',
+					'Japanese traditional gardens often feature elements such as ponds, stone lanterns, and meticulously pruned trees.',
+					'Japan has a rich tradition of folklore, with mythical creatures such as dragons, yokai, and foxes.',
+					'The Himeji Castle in Hyogo is one of Japan\'s most famous and well-preserved castles, known for its white exterior and complex defensive structures.',
+					'Japanese traditional architecture often incorporates natural materials, such as wood, paper, and stone, creating a harmonious connection with nature.',
+					'Japan has a diverse range of regional cuisines, with each region offering unique dishes and local specialties.',
+					'The Gion district in Kyoto is famous for its traditional geisha culture, historic streets, and preserved machiya houses.',
+					'Japanese traditional theater forms, such as Noh and Kabuki, have a long history and are known for their elaborate costumes and stylized performances.',
+					'The Tokyo Skytree is a towering landmark in Tokyo, offering panoramic views of the city from its observation decks.',
+					'Japanese traditional crafts often showcase exquisite craftsmanship, attention to detail, and a respect for traditional techniques.',
+					'Japan has a rich culinary heritage, with traditional dishes such as sushi, ramen, tempura, and kaiseki.',
+					'The Hiroshima Peace Memorial Park is a powerful reminder of the atomic bombing and a place for reflection and peace.',
+					'Japanese traditional gardens often feature elements such as stone pathways, zen rock gardens, and carefully selected plantings.',
+					'Japan has a strong tradition of martial arts, with disciplines such as judo, karate, kendo, and aikido.',
+					'The Akihabara district in Tokyo is a hub for anime, manga, gaming, and electronic gadgets.',
+					'Japanese traditional crafts often draw inspiration from nature and incorporate natural materials such as wood, bamboo, and ceramic.',
+					'The Kinkaku-ji Temple in Kyoto, also known as the Golden Pavilion, is a UNESCO World Heritage Site and a symbol of Japan\'s rich cultural heritage.',
+					'Japanese traditional architecture often utilizes sliding doors, known as fusuma and shoji, made from translucent paper.',
+					'Japan has a rich tradition of mask-making, with various types of masks used in festivals, theater, and religious ceremonies.',
+					'The Todai-ji Temple in Nara houses the Great Buddha, one of the largest bronze statues in the world.',
+					'Japanese traditional music often includes traditional instruments such as the shamisen, koto, and taiko drums.',
+					'Japan has a wide range of traditional crafts, including pottery, lacquerware, textile weaving, and metalwork.',
+					'The Meiji Shrine in Tokyo is dedicated to Emperor Meiji and Empress Shoken and offers a peaceful retreat in the heart of the city.',
+					'Japanese traditional gardens often feature elements such as ponds, stone lanterns, and meticulously pruned trees.',
+					'Japan has a rich tradition of folklore, with mythical creatures such as dragons, yokai, and foxes.',
+					'The Himeji Castle in Hyogo is one of Japan\'s most famous and well-preserved castles, known for its white exterior and complex defensive structures.',
+					'Japanese traditional architecture often incorporates natural materials, such as wood, paper, and stone, creating a harmonious connection with nature.',
+					'Japan has a diverse range of regional cuisines, with each region offering unique dishes and local specialties.',
+					'The Gion district in Kyoto is famous for its traditional geisha culture, historic streets, and preserved machiya houses.',
+					'Japanese traditional theater forms, such as Noh and Kabuki, have a long history and are known for their elaborate costumes and stylized performances.',
+					'The Tokyo Skytree is a towering landmark in Tokyo, offering panoramic views of the city from its observation decks.',
+					'Japanese traditional crafts often showcase exquisite craftsmanship, attention to detail, and a respect for traditional techniques.',
+					'Japan has a rich culinary heritage, with traditional dishes such as sushi, ramen, tempura, and kaiseki.',
+					'The Hiroshima Peace Memorial Park is a powerful reminder of the atomic bombing and a place for reflection and peace.',
+					'Japanese traditional gardens often feature elements such as stone pathways, zen rock gardens, and carefully selected plantings.',
+					'Japan has a strong tradition of martial arts, with disciplines such as judo, karate, kendo, and aikido.',
+					'The Akihabara district in Tokyo is a hub for anime, manga, gaming, and electronic gadgets.',
+					'Japanese traditional crafts often draw inspiration from nature and incorporate natural materials such as wood, bamboo, and ceramic.',
+					'The Kinkaku-ji Temple in Kyoto, also known as the Golden Pavilion, is a UNESCO World Heritage Site and a symbol of Japan\'s rich cultural heritage.',
+					'Japanese traditional architecture often utilizes sliding doors, known as fusuma and shoji, made from translucent paper.',
+					'Japan has a rich tradition of mask-making, with various types of masks used in festivals, theater, and religious ceremonies.',
+					'The Todai-ji Temple in Nara houses the Great Buddha, one of the largest bronze statues in the world.',
+					'Japanese traditional music often includes traditional instruments such as the shamisen, koto, and taiko drums.',
+					'Japan has a wide range of traditional crafts, including pottery, lacquerware, textile weaving, and metalwork.',
+					'The Meiji Shrine in Tokyo is dedicated to Emperor Meiji and Empress Shoken and offers a peaceful retreat in the heart of the city.',
+					'Japanese traditional gardens often feature elements such as ponds, stone lanterns, and meticulously pruned trees.',
+					'Japan has a rich tradition of folklore, with mythical creatures such as dragons, yokai, and foxes.',
+					'The Himeji Castle in Hyogo is one of Japan\'s most famous and well-preserved castles, known for its white exterior and complex defensive structures.',
+					'Japanese traditional architecture often incorporates natural materials, such as wood, paper, and stone, creating a harmonious connection with nature.',
+					'Japan has a diverse range of regional cuisines, with each region offering unique dishes and local specialties.',
+					'The Gion district in Kyoto is famous for its traditional geisha culture, historic streets, and preserved machiya houses.',
+					'Japanese traditional theater forms, such as Noh and Kabuki, have a long history and are known for their elaborate costumes and stylized performances.',
+					'The Tokyo Skytree is a towering landmark in Tokyo, offering panoramic views of the city from its observation decks.',
+					'Japanese traditional crafts often showcase exquisite craftsmanship, attention to detail, and a respect for traditional techniques.',
+					'Japan has a rich culinary heritage, with traditional dishes such as sushi, ramen, tempura, and kaiseki.',
+					'The Hiroshima Peace Memorial Park is a powerful reminder of the atomic bombing and a place for reflection and peace.',
+					'Japanese traditional gardens often feature elements such as stone pathways, zen rock gardens, and carefully selected plantings.',
+					'Japan has a strong tradition of martial arts, with disciplines such as judo, karate, kendo, and aikido.',
+					'The Akihabara district in Tokyo is a hub for anime, manga, gaming, and electronic gadgets.',
+					'Japanese traditional crafts often draw inspiration from nature and incorporate natural materials such as wood, bamboo, and ceramic.',
+					'The Kinkaku-ji Temple in Kyoto, also known as the Golden Pavilion, is a UNESCO World Heritage Site and a symbol of Japan\'s rich cultural heritage.',
+					'Japanese traditional architecture often utilizes sliding doors, known as fusuma and shoji, made from translucent paper.',
+					'Japan has a rich tradition of mask-making, with various types of masks used in festivals, theater, and religious ceremonies.',
+					'The Todai-ji Temple in Nara houses the Great Buddha, one of the largest bronze statues in the world.',
+					'Japanese traditional music often includes traditional instruments such as the shamisen, koto, and taiko drums.',
+					'Japan has a wide range of traditional crafts, including pottery, lacquerware, textile weaving, and metalwork.',
+					'The Meiji Shrine in Tokyo is dedicated to Emperor Meiji and Empress Shoken and offers a peaceful retreat in the heart of the city.',
+					'Japanese traditional gardens often feature elements such as ponds, stone lanterns, and meticulously pruned trees.',
+					'Japan has a rich tradition of folklore, with mythical creatures such as dragons, yokai, and foxes.',
+					'The Himeji Castle in Hyogo is one of Japan\'s most famous and well-preserved castles, known for its white exterior and complex defensive structures.',
+					'Japanese traditional architecture often incorporates natural materials, such as wood, paper, and stone, creating a harmonious connection with nature.',
+					'Japan has a diverse range of regional cuisines, with each region offering unique dishes and local specialties.',
+					'The Gion district in Kyoto is famous for its traditional geisha culture, historic streets, and preserved machiya houses.',
+					'Japanese traditional theater forms, such as Noh and Kabuki, have a long history and are known for their elaborate costumes and stylized performances.',
+					'The Tokyo Skytree is a towering landmark in Tokyo, offering panoramic views of the city from its observation decks.',
+					'Japanese traditional crafts often showcase exquisite craftsmanship, attention to detail, and a respect for traditional techniques.',
+					'Japan has a rich culinary heritage, with traditional dishes such as sushi, ramen, tempura, and kaiseki.',
+					'The Hiroshima Peace Memorial Park is a powerful reminder of the atomic bombing and a place for reflection and peace.',
+					'Japanese traditional gardens often feature elements such as stone pathways, zen rock gardens, and carefully selected plantings.',
+					'Japan has a strong tradition of martial arts, with disciplines such as judo, karate, kendo, and aikido.',
+					'The Akihabara district in Tokyo is a hub for anime, manga, gaming, and electronic gadgets.',
+					'Japanese traditional crafts often draw inspiration from nature and incorporate natural materials such as wood, bamboo, and ceramic.',
+				],
+				currentFact: '',
+				hasGeneratedFact: false,
+				getRandomFact: function() {
+					const randomIndex = Math.floor(Math.random() * this.facts.length);
+					const fact = this.facts[randomIndex];
+					this.facts.splice(randomIndex, 1); // Remove fact from array so it doesn't repeat
+					this.hasGeneratedFact = true;
+					return this.currentFact = fact;
+				},
+				getFactButtonText: function() {
+					return (this.hasGeneratedFact) ? 'Get Another Japan Fact' : 'Get A Japan Fact';
+				}				
+			}"
+			>
+				<div class="flex flex-col items-center justify-center w-full md:w-3/4">
+					<button id="japanFactButton" 
+					class="w-full px-3 py-2 mt-6 mb-6 text-xl text-white uppercase transition-all duration-200 ease-in-out bg-blue-500 border-2 border-transparent rounded-md shadow-sm cursor-pointer hover:border-blue-800 hover:font-bold hover:bg-transparent hover:text-blue-800 md:w-3/4"
+					@click="getRandomFact()"
+					x-text="getFactButtonText()"
+					></button>
+					<div id="japanFactContainer" x-show="currentFact.length > 0 && facts.length > 0">
+						<h5 id="japanFactHeader" class="inline-flex flex-row items-center justify-start w-full gap-2 text-2xl font-bold text-center text-slate-800">
+							<img src="assets/sparkles.svg" class="inline-block w-1/6 lg:w-1/12" />
+							<span>Japan Fact!</span>
+						</h5>
+						<div id="japanFact" class="px-2 py-3 my-6 mt-3 text-left bg-blue-100 border-t-2 border-b-2 border-l-4 border-r-2 shadow-md text-md border-l-blue-800 border-t-blue-300 border-r-blue-300 border-b-blue-300" x-text="currentFact"></div>
+					</div>
+				</div>
+			</section>
+			<section id="facts" 
+			class="flex flex-col items-center max-w-3xl px-3 align-center"
+			x-data="{
+				catFact: '',
+				showLoader: false,
+				hasFetchedFact: false,
+				catFactEndpoint: 'https://catfact.ninja/fact',
+				getFact: function() {
+					this.showLoader = true;
+					if (this.hasFetchedFact) {
+						this.catFact = '';
+					}
+					fetch(this.catFactEndpoint)
+					.then(response => response.json())
+					.then(data => {
+						this.catFact = data.fact;
+						this.showLoader = false;
+						this.hasFetchedFact = true;
+					});
+				},
+				getFactButtonText: function() {
+					return (this.hasFetchedFact) ? 'Get Another Cat Fact' : 'Get A Cat Fact';
+				},
+				meow: function() {
+					const meow = new Audio('assets/audio/meow.mp3');
+					meow.play().then(() => {
+						return this.getFact();
+					});
+				}
+			}">
+				<div class="flex flex-col items-center justify-center w-full md:w-3/4">
+					<button id="getCatFact" 
+						class="w-full px-3 py-2 mt-6 text-xl text-white uppercase transition-all duration-200 ease-in-out bg-orange-500 border-2 border-transparent rounded-md shadow-sm cursor-pointer hover:border-orange-800 hover:font-bold hover:bg-transparent hover:text-orange-800 md:w-3/4" 
+						@click="meow()"
+						x-text="getFactButtonText()"
+						x-bind:class="{'mb-6': !showLoader}"
+						>
+					</button>
+					<div id="factContainer">
+						<div id="loader" class="flex items-center justify-center" x-show="showLoader">
+							<div class="w-12 h-12 my-6 border-t-2 border-b-2 rounded-full animate-spin border-slate-800"></div>
+						</div>
+						<div id="catContainer" x-show="!showLoader && catFact.length > 0" class="relative">
+							<div id="catSvg" class="flex items-center justify-center">
+								<img src="assets/lucky-cat.svg" alt="Lucky Cat" class="w-1/3 lg:w-[20%] absolute -right-[56px] lg:-right-[88px] top-[35px] lg:top-[18px] rotate-[10deg]">
+							</div>
+							<h5 id="catFactHeader" class="inline-flex flex-row items-center justify-start w-full gap-2 text-2xl font-bold text-center text-slate-800">
+								<img src="assets/flag.svg" class="inline-block w-1/6 lg:w-1/12" />
+								<span>Cat Fact!</span>
+							</h5>
+							<p id="catFact" 
+							x-text="catFact"
+							x-show="!showLoader && catFact.length > 0"
+							class="px-2 py-3 my-6 mt-3 text-left bg-orange-100 border-t-2 border-b-2 border-l-4 border-r-2 shadow-md text-md border-l-orange-800 border-t-orange-300 border-r-orange-300 border-b-orange-300"></p>
+						</div>
+					</div>
+				</div>
+			</section>
+		
+		</main>
+	</div>
+	<script>
+ 		self.addEventListener('install', event => {
+			console.log('Service worker installing...');		
+		});
+
+		if ('serviceWorker' in navigator) {
+			window.addEventListener('load', () => {
+			  navigator.serviceWorker.register('/sw.js').then((registration) => {
+				console.log('ServiceWorker registration successful with scope: ', registration.scope);
+			  }, (err) => {
+				console.log('ServiceWorker registration failed: ', err);
+			  });
+			});
+		  }
+	</script>
+</body>
+</html>
